@@ -1,0 +1,31 @@
+import pandas as pd
+
+#Reading first file
+df1 = pd.read_csv('weather_20160301.csv')
+df1['ObservationDate'] = pd.to_datetime(df1['ObservationDate'])
+print(df1.shape[0])
+# Reading second file
+df2 = pd.read_csv('weather_20160201.csv')
+df2['ObservationDate'] = pd.to_datetime(df2['ObservationDate'])
+
+print(df2.shape[0])
+
+#Combing df1 and df2 dataframe to single dataframe
+df = pd.concat([df1, df2], ignore_index=True)
+
+#Coverting to parquet file
+df.to_parquet('weather_output.parquet')
+
+#Reading from parquet file
+dfp = pd.read_parquet('weather_output.parquet')
+print(dfp.shape[0])
+print(dfp.head(3))
+
+#Which date was the hottest day?
+dfdate=pd.to_datetime(dfp[dfp['ScreenTemperature']==dfp['ScreenTemperature'].max()]['ObservationDate'].values[0])
+#What was the temperature on that day?
+dfmaxtemp = dfp['ScreenTemperature'].max()
+#In which region was the hottest day?
+dfregion=dfp[dfp['ScreenTemperature']==dfp['ScreenTemperature'].max()]['Region'].values[0]
+
+print('Hottest Day was on {} at temperature {} in the region of {}'.format(dfdate,dfmaxtemp,dfregion))
